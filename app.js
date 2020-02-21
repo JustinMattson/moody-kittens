@@ -129,20 +129,25 @@ function pet(id) {
  * @param {string} id
  */
 function catnip(id) {
-  document.getElementById("kitten")
+  console.log("Start function catnip()")
   console.log(id) // This is the unique ID of the kitten for which the catnip button was clicked.
+  
+  document.getElementById(id)
+  document.getElementById("kitten")
+  document.getElementById("name")
+  document.getElementById("mood")
+  document.getElementById("affection")
 
   let kittenData = JSON.parse(window.localStorage.getItem("kitten"))
-  console.log(kittenData)  //kittenData is 'null' at this point...
+  //console.log(kittenData)  //kittenData is 'null' at this point...? where is the null coming from?
   // update kittenData set kittenData.mood = "Tolerate" where kitten.id == catnip(id)
   // update kittenData set kittenData.affection = 5 where kitten.id == catnip(id)
   // savekittens()
 
       if(kittenData){
       kittens = kittenData
-    } console.log(kittens) // 
-    //currentKitten = kittens.find(kitten => kitten.name == kittenName)
-    // ){ id: generateId(), name: "Ralph", mood: "Frustrated", affection: 0}
+    } console.log(kittens) // this is the full JSON list of kittens
+    currentKitten = { id: generateId(), name: "Wanda", mood: "Tolerant", affection: 5}
   kittens.push(currentKitten)
   saveKittens()
 }
@@ -203,7 +208,6 @@ function removeKittenById(kittenID) {
   if (index == -1) {
     throw new Error("Invalid Kitten Id")
   }
-  console.log(kitten)
   kittens.splice(index,1)
   console.log("removeKittenById() Success")
   saveKittens()
