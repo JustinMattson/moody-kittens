@@ -128,7 +128,13 @@ function pet(id) {
  * save the kittens
  * @param {string} id
  */
-function catnip(id) {}
+function catnip(id) {
+  document.getElementById("kittens")
+  let kittenName = kittens.name
+  currentKitten = { id: findKittenById(id), name: kittenName, mood: "Tolerant", affection: 5}
+  kittens.push(currentKitten)
+  saveKittens()
+}
 
 /**
  * Sets the kittens mood based on its affection
