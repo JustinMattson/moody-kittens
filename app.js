@@ -129,9 +129,13 @@ function pet(id) {
  * @param {string} id
  */
 function catnip(id) {
-  document.getElementById("kittens")
-  let kittenName = kittens.name
-  currentKitten = { id: findKittenById(id), name: kittenName, mood: "Tolerant", affection: 5}
+  document.getElementById("kitten")
+  console.log(id) // This is the unique ID of the kitten for which the catnip button was clicked.
+  let kittenData = JSON.parse(window.localStorage.getItem("kittens"))
+    if(kittenData){
+      kittens = kittenData
+    } console.log(kittens)
+  currentKitten = { id: generateId(), name: "Ralph", mood: "Frustrated", affection: 0}
   kittens.push(currentKitten)
   saveKittens()
 }
