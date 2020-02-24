@@ -1,6 +1,6 @@
 // Data
-let currentAffection = 5
-let currentMood = "Tolerant"
+let defaultAffection = 5
+let defaultMood = "Tolerant"
 let currentKitten = {}
 
 /**
@@ -19,6 +19,8 @@ loadKittens()
  * https://robohash.org/<INSERTCATNAMEHERE>?set=set4
  * then add that data to the kittens list.
  * Then reset the form
+ * 
+ *  * TODO prevent duplicate kittens with same name.
  */
 function addKitten(event) {
   event.preventDefault()
@@ -27,8 +29,8 @@ function addKitten(event) {
   let kitten = {
     id: generateId(),
     name: form.name.value,
-    mood: currentMood,
-    affection: currentAffection
+    mood: defaultMood,
+    affection: defaultAffection
   }
   kittens.push(kitten)
   console.log(kitten)
@@ -69,10 +71,10 @@ function drawKittens() {
   let kittensTemplate = ""
   kittens.forEach(kitten => {
     kittensTemplate += `
-    <div class="k-card  bg-dark mt-1 mb-1 img src="https://robohash.org/${kitten.name}/?set=set4" alt="Moody Kitten">
+    <div class="k-card bg-dark mt-1 mb-1 img src="https://robohash.org/${kitten.name}/?set=set4" alt="Moody Kitten">
       <img src="https://robohash.org/${kitten.name}/?set=set4" alt="Moody Kitten"></i>
       <font color=#fdfdfd>
-        <h3 ><B>Name:</B> ${kitten.name}</h3>
+        <h3><B>Name:</B> ${kitten.name}</h3>
         <div><B>Mood:</B> ${kitten.mood}</div>
         <div><B>Affection:</B> ${kitten.affection}</div>
       </font>
@@ -95,6 +97,7 @@ function drawKittens() {
  * @return {Kitten}
  */
 function findKittenById(id) {
+  console.log("entered function findKittenById()")
   return kittens.find(k => k.id == id);
   console.log("kitten.id");
   }
@@ -109,13 +112,22 @@ function findKittenById(id) {
  * @param {string} id
  */
 function pet(id) {
-  console.log("pet function activated")
+  console.log("entered function pet()")
+  let mood = "Tolerant"
+  let affection = 5  // get kitten.affection from JSON
+  let rand = 0
 
-  console.log(affectionElement)
-  console.log(id)
-  console.log(kittens)  // found the correct kitten in kittens...
- 
-  console.log("kitten updated")
+  if(Math.random() > 0.7) {
+    rand += 1
+  } else {
+    rand -= 1
+  }
+  affection += rand  // set kitten.affection to JSON
+    console.log(affection)
+    //console.log(id)
+    //console.log(kittens)  // found the correct kitten in kittens...
+    console.log("kitten updated")
+  //setKittenMood()
   saveKittens()
 }
 
@@ -129,7 +141,7 @@ function pet(id) {
  * @param {string} id
  */
 function catnip(id) {
-  console.log("Start function catnip()")
+  console.log("entered function catnip()")
   console.log(id) // This is the unique ID of the kitten for which the catnip button was clicked.
   
   document.getElementById(id)
@@ -146,9 +158,11 @@ function catnip(id) {
 
       if(kittenData){
       kittens = kittenData
-    } console.log(kittens) // this is the full JSON list of kittens
-    currentKitten = { id: generateId(), name: "Wanda", mood: "Tolerant", affection: 5}
-  kittens.push(currentKitten)
+    } 
+    console.log(kittens) // this is the full JSON list of kittens
+    //currentKitten = { id: generate(id), name: "Wanda", mood: "Tolerant", affection: 5}
+  //console.log(currentKitten)
+  //setKittenMood()
   saveKittens()
 }
 
