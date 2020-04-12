@@ -1,15 +1,14 @@
 // Data
-let defaultAffection = 5
-let defaultMood = "Tolerant"
-let currentKitten = {}
+let currentKitten = {};
+let kitten = {};
+let index = 0;
 
 /**
  * Stores the list of kittens
  * @type {Kitten[]}
  */
 let kittens = [];
-let kitten = [];
-loadKittens()
+loadKittens();
 
 /**
  * Called when submitting the new Kitten Form
@@ -19,76 +18,97 @@ loadKittens()
  * https://robohash.org/<INSERTCATNAMEHERE>?set=set4
  * then add that data to the kittens list.
  * Then reset the form
- * 
+ *
  *  * TODO prevent duplicate kittens with same name.
  */
 function addKitten(event) {
-  event.preventDefault()
-  let form = event.target
+  event.preventDefault();
+  let form = event.target;
 
   let kitten = {
     id: generateId(),
     name: form.name.value,
-    mood: defaultMood,
-    affection: defaultAffection
+    mood: null,
+    affection: Math.ceil(Math.random() * 10),
+  };
+
+  let index = kittens.findIndex((kitten) => kitten.name == form.name.value);
+  if (index < 0) {
+    kittens.push(kitten);
+    saveKittens();
+  } else {
+    alert("Kitten already exists");
   }
-  kittens.push(kitten)
-  console.log(kitten)
-  saveKittens()
-  form.reset()
-  drawKittens()
+  setKittenMood(form.name.value);
+  saveKittens();
+  document.getElementById("welcome").classList.add("hidden");
+  form.reset();
 }
 
-console.log(JSON.parse(window.localStorage.getItem("kittens")))
-
 /**
- * Converts the kittens array to a JSON string then
+ * Converts the kittens list to a JSON string then
  * Saves the string to localstorage at the key kittens
  */
 function saveKittens() {
-  window.localStorage.setItem("kittens", JSON.stringify(kittens))
-  console.log("saveKittens() Success")
-  drawKittens()
+  console.log("enter saveKittens()");
+  window.localStorage.setItem("kittens", JSON.stringify(kittens));
+  console.log("saveKittens() Success");
+  drawKittens();
 }
 
 /**
  * Attempts to retrieve the kittens string from localstorage
  * then parses the JSON string into an array. Finally sets
- * the kittens array to the retrieved array
+ * the kittens list to the retrieved array
  */
 function loadKittens() {
-  let storedKittens = JSON.parse(window.localStorage.getItem("kittens"))
-  if(storedKittens){
-    kittens=storedKittens
+  console.log("enter loadKittens()");
+  let storedKittens = JSON.parse(window.localStorage.getItem("kittens"));
+  if (storedKittens) {
+    kittens = storedKittens;
   }
+  console.log("loadKittens() success");
 }
 
 /**
  * Draw all of the kittens to the kittens element
+ * Enhancement:
+ *   Added updated affection "Ran Away!" if the kitten's mood is Gone.
  */
 function drawKittens() {
-  let kittenListElement = document.getElementById("kittens")
-  let kittensTemplate = ""
-  kittens.forEach(kitten => {
+  console.log("enter drawKittens()");
+  let kittenListElement = document.getElementById("kitten");
+  let kittensTemplate = "";
+
+  let ranAway = "";
+  let i = 0;
+  console.log(kittenListElement);
+  kittens.forEach((kitten) => {
+    if (kitten.affection < 1 || kitten.affection == "Ran Away!") {
+      ranAway = "hidden";
+    }
     kittensTemplate += `
-    <div class="k-card bg-dark mt-1 mb-1 img src="https://robohash.org/${kitten.name}/?set=set4" alt="Moody Kitten">
+    <div class="kitten k-card bg-dark mt-1 ${kitten.mood}">
       <img src="https://robohash.org/${kitten.name}/?set=set4" alt="Moody Kitten"></i>
-      <font color=#fdfdfd>
-        <h3><B>Name:</B> ${kitten.name}</h3>
-        <div><B>Mood:</B> ${kitten.mood}</div>
-        <div><B>Affection:</B> ${kitten.affection}</div>
-      </font>
-      <div class="d-flex space-between mt-2">
+      
+      <h3><B>Name:</B> ${kitten.name}</h3>
+      <div><B>Mood:</B> ${kitten.mood}</div>
+      <div><B>Affection:</B> ${kitten.affection}</div>
+      
+      <div class="${ranAway} d-flex space-between mt-2">
         <button class="action btn-cancel type="button" onclick="pet('${kitten.id}')">Pet</button>
-        <i class="action fa fa-trash text-danger" onclick="removeKittenById('${kitten.id}')"></i>
+        <span title="Send kitten to the pound!"><i class="action fa fa-trash text-danger" onclick="removeKittenById('${kitten.id}')"></i></span>
         <button class="action type="button" type="button" onclick="catnip('${kitten.id}')">Catnip</button>
-        </div>
+      </div>
+
     </div>
-    &nbsp`
-  })
-  kittenListElement.innerHTML = kittensTemplate
+    &nbsp&nbsp`;
+    ranAway = "";
+  });
+
+  kittenListElement.innerHTML = kittensTemplate;
   //document.getElementById("kittens").innerHTML = kittensTemplate
-  console.log("drawKittens() Success")
+  console.log("drawKittens() Success");
 }
 
 /**
@@ -97,10 +117,13 @@ function drawKittens() {
  * @return {Kitten}
  */
 function findKittenById(id) {
-  console.log("entered function findKittenById()")
-  return kittens.find(k => k.id == id);
-  console.log("kitten.id");
+  console.log("entered function findKittenById()");
+  let index = kittens.findIndex((kitten) => kitten.id == id);
+  if (index == -1) {
+    throw new Error("Invalid Kitten Id");
   }
+  return kittens.find((k) => k.id == id);
+}
 
 /**
  * Find the kitten in the array of kittens
@@ -109,29 +132,36 @@ function findKittenById(id) {
  * increase the kittens affection
  * otherwise decrease the affection
  * save the kittens
+ *
+ * Additionally:
+ *  Since, when the kitten is pet, the affection is altered, the kitten.mood must be updated.
+ *  Enhancement: function pet() calls setKittenMood()
  * @param {string} id
  */
 function pet(id) {
-  console.log("entered function pet()")
-  let mood = "Tolerant"
-  let affection = 5  // get kitten.affection from JSON
-  let rand = 0
-
-  if(Math.random() > 0.7) {
-    rand += 1
+  //console.log("entered function pet()");
+  
+  // pull the kitten array object from the kittens list.
+  let kitten = findKittenById(id);
+  //console.log("kitten "+ kitten);
+  //console.log("kitten.mood = " + kitten.mood);
+  
+  /* logic to determine whether kitten likes to be pet
+     + means affection++
+     - means affection--
+  */
+  // console.log("kitten.affection before pet: " + kitten.affection)
+  if (Math.random() > 0.7) {
+    kitten.affection++;
   } else {
-    rand -= 1
+    kitten.affection--;
   }
-  affection += rand  // set kitten.affection to JSON
-    console.log(affection)
-    //console.log(id)
-    //console.log(kittens)  // found the correct kitten in kittens...
-    console.log("kitten updated")
-  //setKittenMood()
-  saveKittens()
+  // console.log("kitten.affection after pet: " + kitten.affection);
+
+  // update the kitten mood based on the updated affection
+  setKittenMood(kitten);
+  saveKittens();
 }
-
-
 
 /**
  * Find the kitten in the array of kittens
@@ -141,53 +171,59 @@ function pet(id) {
  * @param {string} id
  */
 function catnip(id) {
-  console.log("entered function catnip()")
-  console.log(id) // This is the unique ID of the kitten for which the catnip button was clicked.
-  
-  document.getElementById(id)
-  document.getElementById("kitten")
-  document.getElementById("name")
-  document.getElementById("mood")
-  document.getElementById("affection")
-
-  let kittenData = JSON.parse(window.localStorage.getItem("kitten"))
-  //console.log(kittenData)  //kittenData is 'null' at this point...? where is the null coming from?
-  // update kittenData set kittenData.mood = "Tolerate" where kitten.id == catnip(id)
-  // update kittenData set kittenData.affection = 5 where kitten.id == catnip(id)
-  // savekittens()
-
-      if(kittenData){
-      kittens = kittenData
-    } 
-    console.log(kittens) // this is the full JSON list of kittens
-    //currentKitten = { id: generate(id), name: "Wanda", mood: "Tolerant", affection: 5}
-  //console.log(currentKitten)
-  //setKittenMood()
-  saveKittens()
+  //console.log("enter catnip()");
+  let kittenArray = findKittenById(id);
+  let index = kittens.findIndex((kitten) => kitten.id == id);
+  //console.log(index);
+  kittens.splice(index, 1, {
+    id: kittenArray.id,
+    name: kittenArray.name,
+    mood: "tolerant",
+    affection: 5,
+  });
+  //console.log("catnip() success");
+  saveKittens();
 }
 
 /**
  * Sets the kittens mood based on its affection
- * Happy > 6, Tolerant <= 5, Angry <= 3, Gone <= 0
+ * Happy > 5, Tolerant <= 5, Angry <= 3, Gone <= 0
  * @param {Kitten} kitten
  */
 function setKittenMood(kitten) {
-  switch (findKittenById(kitten.affection)) {
-  case kitten.affection <= 0:
-    kitten.mood = "Gone";
-    break;
-  case kitten.affection <= 3:
-    kitten.mood = "Angry";
-    break;
-  case kitten.affection <= 5:
-    kitten.mood = "Tolerant";
-    break;
-  case kitten.affection >= 6: // simply > 6 omits 6 from the mood scale
-    kitten.mood = "Happy";
-  }
-
+  let ranAway = "";
+  kittens.forEach((kitten) => {
+    //console.log("setKittenMood()")
+    //console.log(kitten);
+    //console.log(kitten.affection);
+    if (kitten.affection <= 0) {
+      kitten.mood = "gone";
+      // @ts-ignore
+      kitten.affection = "Ran Away!";
+    } else {
+      if (kitten.affection <= 3) {
+        kitten.mood = "angry";
+      } else {
+        if (kitten.affection <= 5) {
+          kitten.mood = "tolerant";
+        } else {
+          if (kitten.affection > 5) {
+            kitten.mood = "happy";
+          }
+        }
+      }
+    }
+  });
+  //console.log("setKittenMood()")
+  //console.log(kitten.mood);
+  document.getElementById("kitten").classList.add(kitten.mood);
+  saveKittens();
 }
 
+/**
+ * Simply removes the splach screen and draws
+ * any existing kitten from local storage.
+ */
 function getStarted() {
   document.getElementById("welcome").remove();
   drawKittens();
@@ -212,17 +248,28 @@ function generateId() {
 }
 
 /**
-*  This function is called with a kitten id
-* and will use the id to find and remove the
-* kitten by their id from the list of kittens:
-* @param {string} kittenID
-*/
+ * This function is called with a kitten id
+ * and will use the id to find and remove the
+ * kitten by their id from the kittens list:
+ * @param {string} kittenID
+ */
 function removeKittenById(kittenID) {
-  let index = kittens.findIndex(kitten => kitten.id == kittenID)
+  let index = kittens.findIndex((kitten) => kitten.id == kittenID);
   if (index == -1) {
-    throw new Error("Invalid Kitten Id")
+    throw new Error("Invalid Kitten Id");
   }
-  kittens.splice(index,1)
-  console.log("removeKittenById() Success")
-  saveKittens()
+  kittens.splice(index, 1);
+  console.log("removeKittenById() Success");
+  saveKittens();
+}
+
+/**
+ * This function simply overwrites the 
+ * kittens list with an empty array,
+ * and saves to local storage.
+ */
+function deleteAllKittens() {
+  kittens = [];
+  saveKittens();
+  document.getElementById("welcome").remove();
 }

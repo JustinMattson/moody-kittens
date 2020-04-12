@@ -18,9 +18,9 @@
 <body>
   <header class="bg-dark d-flex align-items-center p-1 space-between">
     <img src="moody-logo.png" height="60" alt="Moody Kittens">
-    <form class="" onsubmit="addKitten(event)">
+    <form class="form" onsubmit="addKitten(event)">
       <div class="d-flex">
-        <input placeholder="Name" type="text" name="name" />
+        <input placeholder="Name" type="text" name="name" required/>
         <button class="btn-special" type="submit">
           /ᐠ｡ꞈ｡ᐟ\
         </button>
@@ -36,12 +36,14 @@
           <p>This is my starter template modified to tackle the challenges laid out.</p>
           <small>Thanks and Enjoy!</small>
           <br>
-          <button onclick="getStarted()">Get Started</button>
+          <button onclick="getStarted()">Resume Play</button>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <button class="btn-cancel" onclick="deleteAllKittens()">Fresh Start</button>
         </div>
       </div>
     </div>
     <div class="p-2">
-      <div id="kittens" class="d-flex align-items-center flex-wrap">
+      <div id="kitten" class="d-flex align-items-center flex-wrap">
       </div>
   </main>
   <footer class="card bg-dark text-light p-2 d-flex align-items-center justify-content-center">
