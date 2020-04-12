@@ -84,12 +84,13 @@ function drawKittens() {
   let i = 0;
   console.log(kittenListElement);
   kittens.forEach((kitten) => {
+    // @ts-ignore
     if (kitten.affection < 1 || kitten.affection == "Ran Away!") {
       ranAway = "hidden";
     }
     kittensTemplate += `
     <div class="kitten k-card bg-dark mt-1 ${kitten.mood}">
-      <img src="https://robohash.org/${kitten.name}/?set=set4" alt="Moody Kitten"></i>
+      <center><img src="https://robohash.org/${kitten.name}/?set=set4" alt="Moody Kitten"></i></center>
       
       <h3><B>Name:</B> ${kitten.name}</h3>
       <div><B>Mood:</B> ${kitten.mood}</div>
