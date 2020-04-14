@@ -40,9 +40,9 @@ function addKitten(event) {
     alert("Kitten already exists");
   }
   setKittenMood(form.name.value);
-  saveKittens();
-  document.getElementById("welcome").classList.add("hidden");
   form.reset();
+    
+  document.getElementById("welcome").classList.add("hidden");
 }
 
 /**
@@ -76,7 +76,7 @@ function loadKittens() {
  *   Added updated affection "Ran Away!" if the kitten's mood is Gone.
  */
 function drawKittens() {
-  console.log("enter drawKittens()");
+  //console.log("enter drawKittens()");
   let kittenListElement = document.getElementById("kitten");
   let kittensTemplate = "";
 
@@ -109,7 +109,7 @@ function drawKittens() {
 
   kittenListElement.innerHTML = kittensTemplate;
   //document.getElementById("kittens").innerHTML = kittensTemplate
-  console.log("drawKittens() Success");
+  //console.log("drawKittens() Success");
 }
 
 /**
